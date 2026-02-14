@@ -1,0 +1,8 @@
+<div class="form-control">
+  <%= f.label :role, class: 'label' %>
+  <%= f.select :role, nil, {}, class: 'base-select' do %>
+    <option value="admin"><%= t('admin') %></option>
+    <option value="editor"><%= t('editor') %></option>
+    <option value="viewer"><%= t('viewer') %></option>
+  <% end %>
+</div>

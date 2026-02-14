@@ -1,0 +1,3 @@
+<div class="mt-2 mb-1">
+  <%= link_to submitter.sent_at? ? t('re_send_sms') : t('send_sms'), '#', class: 'btn btn-sm btn-primary w-full', data: { turbo_method: :post } %>
+</div>
