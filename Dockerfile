@@ -2,18 +2,20 @@ FROM ruby:4.0.1-alpine AS download
 
 WORKDIR /fonts
 
-RUN apk --no-cache add fontforge wget && \
-    wget https://github.com/satbyy/go-noto-universal/releases/download/v7.0/GoNotoKurrent-Regular.ttf && \
-    wget https://github.com/satbyy/go-noto-universal/releases/download/v7.0/GoNotoKurrent-Bold.ttf && \
-    wget https://github.com/impallari/DancingScript/raw/master/fonts/DancingScript-Regular.otf && \
-    wget https://cdn.jsdelivr.net/gh/notofonts/notofonts.github.io/fonts/NotoSansSymbols2/hinted/ttf/NotoSansSymbols2-Regular.ttf && \
-    wget https://github.com/Maxattax97/gnu-freefont/raw/master/ttf/FreeSans.ttf && \
-    wget https://github.com/impallari/DancingScript/raw/master/OFL.txt && \
-    # NOTE: Field detection model from docusealco - fork fields-detection repo for full independence
-    wget -O /model.onnx "https://github.com/docusealco/fields-detection/releases/download/2.0.0/model_704_int8.onnx" && \
-    wget -O pdfium-linux.tgz "https://github.com/BermudaFranchise/B-Pdfium/releases/latest/download/pdfium-linux-$(uname -m | sed 's/x86_64/x64/;s/aarch64/arm64/').tgz" && \
+COPY vendor/fonts/GoNotoKurrent-Regular.ttf .
+COPY vendor/fonts/GoNotoKurrent-Bold.ttf .
+COPY vendor/fonts/DancingScript-Regular.otf .
+COPY vendor/fonts/NotoSansSymbols2-Regular.ttf .
+COPY vendor/fonts/FreeSans.ttf .
+COPY vendor/fonts/OFL.txt .
+COPY vendor/models/model_704_int8.onnx /model.onnx
+COPY vendor/pdfium/pdfium-linux-x64.tgz /tmp/pdfium-linux-x64.tgz
+COPY vendor/pdfium/pdfium-linux-arm64.tgz /tmp/pdfium-linux-arm64.tgz
+
+RUN apk --no-cache add fontforge && \
+    cp /tmp/pdfium-linux-$(uname -m | sed 's/x86_64/x64/;s/aarch64/arm64/').tgz /tmp/pdfium-linux.tgz && \
     mkdir -p /pdfium-linux && \
-    tar -xzf pdfium-linux.tgz -C /pdfium-linux
+    tar -xzf /tmp/pdfium-linux.tgz -C /pdfium-linux
 
 RUN fontforge -lang=py -c 'font1 = fontforge.open("FreeSans.ttf"); font2 = fontforge.open("NotoSansSymbols2-Regular.ttf"); font1.mergeFonts(font2); font1.generate("FreeSans.ttf")'
 
